@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function signedIn(){ return request.auth != null; }
+  function me(){ return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+  function admin(){ return signedIn() && me().role == 'admin'; }
+  function vendorOwns(vendorId){ return signedIn() && get(/databases/$(database)/documents/vendors/$(vendorId)).data.ownerId == request.auth.uid; }
+  match /users/{uid} { allow read: if signedIn() && (request.auth.uid == uid || admin()); allow create: if signedIn() && request.auth.uid == uid && request.resource.data.role == 'user'; allow update: if admin() || (request.auth.uid == uid && request.resource.data.role == resource.data.role); }
+  match /vendors/{id} { allow read: if resource.data.status == 'approved' || vendorOwns(id) || admin(); allow create: if signedIn() && request.resource.data.ownerId == request.auth.uid && request.resource.data.status == 'pending' && request.resource.data.verified == false; allow update: if admin() || (vendorOwns(id) && request.resource.data.status == resource.data.status && request.resource.data.verified == resource.data.verified); }
+  match /services/{id} { allow read: if resource.data.status == 'approved' || vendorOwns(resource.data.vendorId) || admin(); allow create,update,delete: if admin() || vendorOwns(request.resource.data.vendorId); }
+  match /bookings/{id} { allow create: if signedIn() && request.resource.data.userId == request.auth.uid && request.resource.data.status == 'pending'; allow read: if signedIn() && (resource.data.userId == request.auth.uid || vendorOwns(resource.data.vendorId) || admin()); allow update: if admin() || (resource.data.userId == request.auth.uid && request.resource.data.status == 'cancelled') || (vendorOwns(resource.data.vendorId) && request.resource.data.userId == resource.data.userId); }
+  match /savedVendors/{id} { allow read,write: if signedIn() && request.resource.data.userId == request.auth.uid; }
+  match /conversations/{id} { allow read,create,update: if signedIn() && request.auth.uid in request.resource.data.participants; }
+  match /messages/{id} { allow create: if signedIn() && request.resource.data.senderId == request.auth.uid; allow read: if signedIn() && request.auth.uid in get(/databases/$(database)/documents/conversations/$(resource.data.conversationId)).data.participants; }
+  match /reviews/{id} { allow read: if true; allow create: if signedIn() && request.resource.data.userId == request.auth.uid; }
+  match /reports/{id} { allow create: if signedIn(); allow read,update: if admin(); }
+ }
+}
