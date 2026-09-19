@@ -8,7 +8,7 @@ service cloud.firestore {
     function conversationMember(conversationId) { return signedIn() && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants; }
 
     match /users/{uid} {
-      allow create: if signedIn() && request.auth.uid == uid && request.resource.data.role == 'user';
+      allow create: if signedIn() && request.auth.uid == uid && request.resource.data.role == 'user' && request.resource.data.status == 'active';
       allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
       // A user can edit their profile, but never change their role. Admins assign vendor/admin roles.
       allow update: if isAdmin() || (request.auth.uid == uid && request.resource.data.role == resource.data.role);
