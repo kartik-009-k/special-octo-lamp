@@ -7,7 +7,7 @@ Download or clone this repository. All pages are plain files, so there is no bui
 
 ## 2. Create a Firebase project
 1. Go to [Firebase Console](https://console.firebase.google.com), create a project, and add a **Web app**.
-2. Copy its configuration values into `js/firebase-config.js`. Do not commit real secrets to a public repository if your project has restrictions you need to protect.
+2. The supplied project configuration is already in `js/firebase-config.js`. If you use a different Firebase project, replace every value there with the configuration from its Web app. Firebase API keys are public project identifiers; protect data with the included Firestore Rules and Firebase API restrictions.
 
 ## 3. Enable sign-in
 In Firebase Console, open **Authentication → Sign-in method**, enable **Email/Password**, then save.
@@ -36,7 +36,7 @@ Push this repository to GitHub. In **Settings → Pages**, select **Deploy from 
 ## WHAT YOU NEED TO DO MANUALLY
 
 1. Create your Firebase project and Web app.
-2. Paste your own Firebase configuration into `js/firebase-config.js`.
+2. If you use another Firebase project, paste its Firebase Web configuration into `js/firebase-config.js`.
 3. Enable Email/Password Authentication and create Firestore.
 4. Deploy `firestore.rules`.
 5. Promote your first registered user to `admin` in Firestore.
