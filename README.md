@@ -1,52 +1,48 @@
 # 🧿 Shirwal Circle
 
-A deliberately simple, GitHub Pages-friendly local-services marketplace for Shirwal, Maharashtra. It uses vanilla HTML/CSS/JavaScript, Firebase Authentication + Firestore, and Leaflet/OpenStreetMap. **There are no payments**: bookings are requests only.
+Shirwal Circle is a simple local-services marketplace that runs completely inside the browser. It is designed to work on GitHub Pages without Firebase, Firestore Rules, a backend, or any permission configuration.
 
-## 1. Download and open it
-Download or clone this repository. All pages are plain files, so there is no build step and no Node installation.
+## How it works
 
-## 2. Create a Firebase project
-1. Go to [Firebase Console](https://console.firebase.google.com), create a project, and add a **Web app**.
-2. The supplied project configuration is already in `js/firebase-config.js`. If you use a different Firebase project, replace every value there with the configuration from its Web app. Firebase API keys are public project identifiers; protect data with the included Firestore Rules and Firebase API restrictions.
+All registration data, vendor applications, bookings, status changes, and chat messages are stored in the current browser's `localStorage` under `shirwal-circle-internal-v1`.
 
-## 3. Enable sign-in
-In Firebase Console, open **Authentication → Sign-in method**, enable **Email/Password**, then save.
+This means the app works immediately after deployment, but it also means:
 
-## 4. Create Firestore and deploy rules
-Create a **Cloud Firestore** database. Paste `firestore.rules` into Firestore → Rules and publish it. These rules enforce roles and prevent users from promoting themselves.
+- Data stays only on the browser and device where it was created.
+- Data is not shared with another phone, browser, or user profile.
+- Clearing browser site data clears the internal workspace.
+- This internal mode is suitable for demos, learning, and a single-device prototype—not a production multi-user marketplace.
 
-## 5. Create the first admin
-1. Register a normal account in the website. Registration creates **Authentication → Users** and a matching Firestore document at `users/{UID}` automatically.
-2. In Firebase Console, open **Firestore Database → Data → users → {UID}**. Change only `role` from `user` to `admin`, then save.
-3. Log out and log back in. The app reads `users/{UID}` on login and sends admins to **Admin Mission Control**. This manual first-admin step is intentional; there is no public “make me admin” button.
+## Run locally
 
-## 6. Add demo / real data
-The website has clearly labelled local fallback demo data in `js/demo-data.js`. For live data, add vendor documents to `vendors` with `status: "approved"`, `ownerId`, business fields, and `bookingEnabled`. Add services in `services` using `vendorId`. Vendor applications are created as `pending` by the website and an admin must set them to `approved`.
-
-## 7. Test locally
-Run a simple static server from this folder, for example:
+No packages or build step are required. Run a simple static server:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then visit `http://localhost:8000`. A server is needed because this project uses JavaScript module imports.
+Then open `http://localhost:8000`.
 
-## 8. Deploy to GitHub Pages
-Push this repository to GitHub. In **Settings → Pages**, select **Deploy from a branch**, choose your branch and `/ (root)`, then save. Add the deployed GitHub Pages URL to Firebase Authentication → Settings → Authorized domains if Firebase requires it.
+## Internal demo accounts
 
-### Booking requests
+The app seeds these accounts on first use:
 
-The customer booking flow writes directly to `bookings` with the Firebase Auth UID as `userId` and `status: "pending"`. It does not query other customers’ bookings before writing: Firestore correctly denies that private read, and that query was the source of the permission error before the booking write could run. The vendor checks availability when accepting a pending request.
+| Role | Email | Password |
+| --- | --- | --- |
+| Admin | `admin@shirwal.local` | `admin123` |
+| Vendor | `vendor@shirwal.local` | `vendor123` |
 
-After deploying this update, copy the complete `firestore.rules` file into **Firebase Console → Firestore Database → Rules** and click **Publish**. If a booking fails afterwards, open the browser Console. The booking code logs the Auth UID, payload field names, status, vendor ID, service ID, and Firebase error code/message without logging passwords, tokens, or customer details.
+Use the admin account to approve a submitted vendor business. Approval changes that local account to a vendor. Use the vendor account to accept, reject, or complete bookings for its own business.
+
+## What you can test
+
+1. Register a normal customer account.
+2. Browse vendors and create a booking request.
+3. View and cancel that booking from **My bookings**.
+4. Sign in as the internal admin to view all booking requests and approve vendor applications.
+5. Sign in as a vendor to accept, reject, or complete bookings for that vendor's business.
+6. Start and send text chat messages. They persist after refresh in the same browser.
 
 ## WHAT YOU NEED TO DO MANUALLY
 
-1. Create your Firebase project and Web app.
-2. If you use another Firebase project, paste its Firebase Web configuration into `js/firebase-config.js`.
-3. Enable Email/Password Authentication and create Firestore.
-4. Deploy `firestore.rules`.
-5. In Firestore Data, change your first registered user’s `users/{UID}.role` from `user` to `admin`, then log out and back in.
-6. Add/approve live vendors and services, or adapt the provided demo data.
-7. Enable GitHub Pages and authorize its domain in Firebase Authentication.
+Nothing is required to run the internal version. If you later need real multi-device accounts, real-time chat, and shared data, a backend service such as Firebase must be deliberately reintroduced and configured.
