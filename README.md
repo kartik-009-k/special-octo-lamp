@@ -32,15 +32,15 @@ The app seeds these accounts on first use:
 | Admin | `admin@shirwal.local` | `admin123` |
 | Vendor | `vendor@shirwal.local` | `vendor123` |
 
-Use the admin account to approve a submitted vendor business. Approval changes that local account to a vendor. Use the vendor account to accept, reject, or complete bookings for its own business.
+A newly created internal business is available immediately and promotes its owner to `vendor`. The admin account can see every internal booking in both Admin Mission Control and the **All bookings** page. Use a vendor account to accept, reject, or complete bookings for its own businesses.
 
 ## What you can test
 
 1. Register a normal customer account.
 2. Browse vendors and create a booking request.
 3. View and cancel that booking from **My bookings**.
-4. Sign in as the internal admin to view all booking requests and approve vendor applications.
-5. Sign in as a vendor to accept, reject, or complete bookings for that vendor's business.
+4. Sign in as the internal admin to view every booking request in Admin Mission Control or **All bookings**.
+5. Sign in as a vendor to view and accept, reject, or complete bookings for that vendor's businesses.
 6. Start and send text chat messages. They persist after refresh in the same browser.
 
 ## WHAT YOU NEED TO DO MANUALLY
